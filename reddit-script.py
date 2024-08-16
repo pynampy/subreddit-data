@@ -1,16 +1,11 @@
 import praw
-import json
-from datetime import datetime, timedelta
 import os
+import utils
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
+
 
 load_dotenv()
-
-
-def convert_timestamp_to_human_readable(timestamp):
-    dt = datetime.fromtimestamp(timestamp)
-    human_readable_date = dt.strftime('%Y-%m-%d %H:%M:%S')
-    return human_readable_date
 
 
 def fetch_posts(subreddit_name, limit=1000):
@@ -41,7 +36,7 @@ def fetch_posts(subreddit_name, limit=1000):
                     'body': submission.selftext,
                     'author': submission.author.name,
                     'url': submission.url,
-                    'created': convert_timestamp_to_human_readable(submission.created),
+                    'created': utils.convert_timestamp_to_human_readable(submission.created),
                     'created_unix': submission.created
                 })
             index += 1
@@ -49,12 +44,9 @@ def fetch_posts(subreddit_name, limit=1000):
     return posts
 
 
-def write_to_json(posts, filename='reddit_posts.json'):
-    with open(filename, 'w') as f:
-        json.dump(posts, f, indent=4)
-
+subreddits = ['forhire']
 
 if __name__ == "__main__":
-    subreddit_name = 'forhire'
-    posts = fetch_posts(subreddit_name)
-    write_to_json(posts)
+    for subreddit in subreddits:
+        posts = fetch_posts(subreddit)
+        utils.write_to_json(posts, subreddit)
